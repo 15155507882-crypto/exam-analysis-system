@@ -64,13 +64,33 @@
 
   <p><strong>全校排名</strong>: {{ total_rank_str }}</p>
 
-  <!-- 二、偏科分析 -->
-  <div class="section-title">二、偏科分析</div>
+  <!-- 二、学科雷达图 -->
+  <div class="section-title">二、学科雷达图</div>
+  {% if radar_img %}
+  <div style="text-align:center; margin:10px 0;">
+    <img src="{{ radar_img }}" style="max-width:100%; height:auto;" alt="学科雷达图">
+  </div>
+  <p style="text-align:center; font-size:9pt; color:#999;">蓝色区域 = 该生各科得分率，灰色虚线 = 全校均分</p>
+  {% else %}
+  <p style="color:#999;">（雷达图生成失败）</p>
+  {% endif %}
+
+  <!-- 三、偏科分析 -->
+  <div class="section-title">三、偏科分析</div>
   <p><strong>偏科指数</strong>: {{ imbalance_index }} — {{ imbalance_level }} {{ imbalance_icon }}</p>
   <p><strong>文理倾向</strong>: {{ arts_bias_direction }} (偏差值: {{ arts_bias_value }})</p>
 
-  <!-- 三、优劣势 -->
-  <div class="section-title">三、优劣势分析</div>
+  <!-- 四、各科百分位 -->
+  <div class="section-title">四、各科全校百分位</div>
+  {% if percentile_img %}
+  <div style="text-align:center; margin:10px 0;">
+    <img src="{{ percentile_img }}" style="max-width:100%; height:auto;" alt="各科百分位">
+  </div>
+  <p style="text-align:center; font-size:9pt; color:#999;">绿色=优势(前25%), 黄色=一般, 红色=薄弱(后25%)</p>
+  {% endif %}
+
+  <!-- 五、优劣势 -->
+  <div class="section-title">五、优劣势分析</div>
   <p><span class="strength">★ 优势学科:</span>
   {% for s in strengths %}
     {{ s.label }}({{ s.score }}/{{ s.max }}){% if not loop.last %}、{% endif %}
@@ -85,8 +105,8 @@
   {% if not weaknesses %}—{% endif %}
   </p>
 
-  <!-- 四、提分潜力 -->
-  <div class="section-title">四、提分潜力</div>
+  <!-- 六、提分潜力 -->
+  <div class="section-title">六、提分潜力</div>
   {% if improvements %}
   <table class="score-table">
     <tr><th>优先级</th><th>学科</th><th>当前分数</th><th>目标分数</th><th>可提分</th></tr>
@@ -104,9 +124,9 @@
   <p>各科均衡，无明显提分短板。</p>
   {% endif %}
 
-  <!-- 五、高中选科建议 -->
-  <div class="section-title">五、高中选科建议（新高考 3+1+2）</div>
-  <p><strong>“1”的选择</strong>: {{ recommended_1 }}</p>
+  <!-- 七、高中选科建议 -->
+  <div class="section-title">七、高中选科建议（新高考 3+1+2）</div>
+  <p><strong>「1」的选择</strong>: {{ recommended_1 }}</p>
   <p style="color:#666; font-size:10pt;">{{ reason_1 }}</p>
 
   <div style="text-align:center; margin: 15px 0;">
@@ -118,8 +138,8 @@
     {% endfor %}
   </div>
 
-  <!-- 六、暑期学习建议 -->
-  <div class="section-title">六、暑期学习建议</div>
+  <!-- 八、暑期学习建议 -->
+  <div class="section-title">八、暑期学习建议</div>
   <ul class="advice-list">
     {% for tip in study_tips %}
     <li{% if loop.first %} class="priority"{% endif %}>{{ tip }}</li>

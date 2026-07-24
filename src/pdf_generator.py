@@ -1,7 +1,7 @@
 """PDF 报告生成模块。
 
 功能：
-- render_html(): Jinja2 模板渲染
+- render_html(): Jinja2 模板渲染（含雷达图+百分位图）
 - generate_single_pdf(): 单份 PDF 生成
 - generate_batch_pdf(): 批量 PDF 生成
 - create_zip_archive(): ZIP 打包下载
@@ -9,6 +9,7 @@
 
 import os
 import io
+import base64
 import zipfile
 import tempfile
 from datetime import datetime
@@ -29,12 +30,28 @@ from .utils import (
 TEMPLATE_DIR = Path(__file__).parent.parent / "templates"
 
 
+def fig_to_base64(fig) -> str:
+    """将 Plotly Figure 转换为 base64 PNG 字符串，用于嵌入 HTML/PDF。
+
+    Returns:
+        "data:image/png;base64,..." 格式的字符串
+    """
+    try:
+        img_bytes = fig.to_image(format="png", width=500, height=400, scale=2)
+        b64 = base64.b64encode(img_bytes).decode("utf-8")
+        return f"data:image/png;base64,{b64}"
+    except Exception:
+        return ""
+
+
 def render_html(
     profile_data: Dict[str, Any],
     improvements: List[Dict[str, Any]],
     selection_advice: Dict[str, Any],
     study_strategy_data: Dict[str, Any],
     school_name: str = "",
+    radar_img: str = "",
+    percentile_img: str = "",
 ) -> str:
     """使用 Jinja2 渲染个人报告 HTML。
 
@@ -150,6 +167,8 @@ def render_html(
         "study_tips": study_strategy_data.get("tips", []),
         "focus_subjects": study_strategy_data.get("focus_subjects", []),
         "date": datetime.now().strftime("%Y-%m-%d"),
+        "radar_img": radar_img,
+        "percentile_img": percentile_img,
     }
 
     return template.render(**context)
@@ -209,6 +228,9 @@ def generate_batch_pdf(
 
     total = len(student_indices)
 
+    # 延迟导入可视化，避免循环依赖
+    from .visualizations import plot_radar, plot_horizontal_percentile
+
     for i, idx in enumerate(student_indices):
         student_row = df.iloc[idx]
 
@@ -220,8 +242,37 @@ def generate_batch_pdf(
         selection_advice = planning_selection_func(student_row, df)
         strategy_data = planning_strategy_func(student_row, df, max_scores)
 
+        # 生成雷达图
+        radar = profile_data.get("radar", {})
+        radar_img = ""
+        if radar.get("categories") and radar.get("student_rates"):
+            fig_radar = plot_radar(
+                categories=radar["categories"],
+                values=radar["student_rates"],
+                title=f"{profile_data.get('name', '')} - 各科得分率",
+                reference_values=radar.get("avg_rates"),
+                reference_label="全校均分",
+            )
+            radar_img = fig_to_base64(fig_radar)
+
+        # 生成百分位图
+        pct_data = profile_data.get("percentile", {}).get("subject_percentiles", {})
+        percentile_img = ""
+        if pct_data:
+            cat_labels = [SUBJECT_LABELS.get(s, s) for s in pct_data.keys()]
+            cat_values = [v if v is not None else 0 for v in pct_data.values()]
+            fig_pct = plot_horizontal_percentile(
+                categories=cat_labels,
+                values=cat_values,
+                title=f"{profile_data.get('name', '')} - 各科全校百分位",
+            )
+            percentile_img = fig_to_base64(fig_pct)
+
         # 渲染 HTML
-        html = render_html(profile_data, improvements, selection_advice, strategy_data)
+        html = render_html(
+            profile_data, improvements, selection_advice, strategy_data,
+            radar_img=radar_img, percentile_img=percentile_img,
+        )
 
         # 生成 PDF
         name = profile_data.get("name", f"student_{idx}")

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    {{ css }}
+  </style>
+</head>
+<body>
+
+  <!-- 封面 -->
+  <div class="report-header">
+    <h1>{{ school_name }} 中考个人学业报告</h1>
+    <div class="subtitle">2026 年中考成绩分析 · 个人专属画像</div>
+  </div>
+
+  <!-- 学生信息 -->
+  <div class="student-info">
+    <div class="info-item">
+      <div class="info-label">姓名</div>
+      <div class="info-value">{{ name }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">考生号</div>
+      <div class="info-value">{{ exam_id }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">毕业中学</div>
+      <div class="info-value">{{ school }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">性别</div>
+      <div class="info-value">{{ gender }}</div>
+    </div>
+  </div>
+
+  <!-- 一、成绩概览 -->
+  <div class="section-title">一、成绩概览</div>
+  <table class="score-table">
+    <tr>
+      <th>学科</th>
+      <th>得分</th>
+      <th>满分</th>
+      <th>得分率</th>
+      <th>等级</th>
+    </tr>
+    {% for s in subjects %}
+    <tr>
+      <td>{{ s.label }}</td>
+      <td>{{ s.score if s.score is not none else '缺' }}</td>
+      <td>{{ s.max }}</td>
+      <td>{{ s.rate }}</td>
+      <td>{{ s.grade }}</td>
+    </tr>
+    {% endfor %}
+    <tr style="font-weight:bold; background:#e8f0fe;">
+      <td>总分</td>
+      <td>{{ total_score if total_score is not none else '缺' }}</td>
+      <td>{{ total_full }}</td>
+      <td>{{ total_rate }}</td>
+      <td>{{ total_grade }}</td>
+    </tr>
+  </table>
+
+  <p><strong>全校排名</strong>: {{ total_rank_str }}</p>
+
+  <!-- 二、偏科分析 -->
+  <div class="section-title">二、偏科分析</div>
+  <p><strong>偏科指数</strong>: {{ imbalance_index }} — {{ imbalance_level }} {{ imbalance_icon }}</p>
+  <p><strong>文理倾向</strong>: {{ arts_bias_direction }} (偏差值: {{ arts_bias_value }})</p>
+
+  <!-- 三、优劣势 -->
+  <div class="section-title">三、优劣势分析</div>
+  <p><span class="strength">★ 优势学科:</span>
+  {% for s in strengths %}
+    {{ s.label }}({{ s.score }}/{{ s.max }}){% if not loop.last %}、{% endif %}
+  {% endfor %}
+  {% if not strengths %}—{% endif %}
+  </p>
+
+  <p><span class="weakness">⚠ 薄弱学科:</span>
+  {% for w in weaknesses %}
+    {{ w.label }}({{ w.score }}/{{ w.max }}){% if not loop.last %}、{% endif %}
+  {% endfor %}
+  {% if not weaknesses %}—{% endif %}
+  </p>
+
+  <!-- 四、提分潜力 -->
+  <div class="section-title">四、提分潜力</div>
+  {% if improvements %}
+  <table class="score-table">
+    <tr><th>优先级</th><th>学科</th><th>当前分数</th><th>目标分数</th><th>可提分</th></tr>
+    {% for imp in improvements[:5] %}
+    <tr>
+      <td>{{ imp.priority }}</td>
+      <td>{{ imp.label }}</td>
+      <td>{{ imp.current }}</td>
+      <td>{{ imp.target }}</td>
+      <td>+{{ imp.potential }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p>各科均衡，无明显提分短板。</p>
+  {% endif %}
+
+  <!-- 五、高中选科建议 -->
+  <div class="section-title">五、高中选科建议（新高考 3+1+2）</div>
+  <p><strong>“1”的选择</strong>: {{ recommended_1 }}</p>
+  <p style="color:#666; font-size:10pt;">{{ reason_1 }}</p>
+
+  <div style="text-align:center; margin: 15px 0;">
+    {% for plan in selection_plans %}
+    <div class="plan-box">
+      <div class="plan-name">{{ plan.name }}</div>
+      <div class="plan-subjects">{{ plan.subjects }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- 六、暑期学习建议 -->
+  <div class="section-title">六、暑期学习建议</div>
+  <ul class="advice-list">
+    {% for tip in study_tips %}
+    <li{% if loop.first %} class="priority"{% endif %}>{{ tip }}</li>
+    {% endfor %}
+  </ul>
+
+  {% if focus_subjects %}
+  <p><strong>暑期重点</strong>: {% for s in focus_subjects %}{{ s }}{% if not loop.last %}、{% endif %}{% endfor %}</p>
+  {% endif %}
+
+  <div class="footer-note">
+    本报告由中考成绩分析系统自动生成 · 数据仅在本地处理 · {{ date }}
+  </div>
+
+</body>
+</html>

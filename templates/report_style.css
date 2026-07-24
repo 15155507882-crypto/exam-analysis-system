@@ -1,0 +1,161 @@
+/* 个人 PDF 报告样式 */
+
+@page {
+  size: A4;
+  margin: 1.5cm 2cm;
+  @bottom-center {
+    content: "— " counter(page) " —";
+    font-size: 9pt;
+    color: #999;
+    font-family: "PingFang SC", "Microsoft YaHei", "SimHei", sans-serif;
+  }
+}
+
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "SimHei", "Heiti SC", sans-serif;
+  font-size: 12pt;
+  line-height: 1.8;
+  color: #333;
+}
+
+/* 封面 */
+.report-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid #1a73e8;
+}
+
+.report-header h1 {
+  font-size: 22pt;
+  color: #1a73e8;
+  margin-bottom: 8px;
+}
+
+.report-header .subtitle {
+  font-size: 11pt;
+  color: #666;
+}
+
+/* 学生信息栏 */
+.student-info {
+  display: flex;
+  justify-content: space-between;
+  background: #f0f4ff;
+  border-radius: 8px;
+  padding: 12px 20px;
+  margin: 15px 0;
+}
+
+.student-info .info-item {
+  text-align: center;
+}
+
+.student-info .info-label {
+  font-size: 9pt;
+  color: #888;
+}
+
+.student-info .info-value {
+  font-size: 14pt;
+  font-weight: bold;
+  color: #1a73e8;
+}
+
+/* 章节标题 */
+.section-title {
+  font-size: 15pt;
+  color: #1a73e8;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 6px;
+  margin: 25px 0 12px 0;
+  page-break-before: avoid;
+}
+
+/* 成绩表格 */
+.score-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 10pt;
+}
+
+.score-table th {
+  background: #1a73e8;
+  color: white;
+  padding: 6px 10px;
+  text-align: center;
+}
+
+.score-table td {
+  padding: 5px 10px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+.score-table tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+/* 优势薄弱 */
+.strength {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+.weakness {
+  color: #c62828;
+  font-weight: bold;
+}
+
+/* 建议列表 */
+.advice-list {
+  list-style: none;
+  padding: 0;
+}
+
+.advice-list li {
+  padding: 8px 12px;
+  margin: 5px 0;
+  background: #f5f5f5;
+  border-left: 4px solid #1a73e8;
+  border-radius: 0 4px 4px 0;
+}
+
+.advice-list li.priority {
+  border-left-color: #c62828;
+}
+
+/* 选科方案 */
+.plan-box {
+  display: inline-block;
+  background: #e8f0fe;
+  border: 1px solid #1a73e8;
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin: 6px;
+  min-width: 140px;
+  text-align: center;
+}
+
+.plan-box .plan-name {
+  font-size: 10pt;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.plan-box .plan-subjects {
+  font-size: 14pt;
+  font-weight: bold;
+  color: #1a73e8;
+}
+
+/* 页脚提示 */
+.footer-note {
+  margin-top: 30px;
+  padding-top: 10px;
+  border-top: 1px solid #e0e0e0;
+  font-size: 9pt;
+  color: #999;
+  text-align: center;
+}
